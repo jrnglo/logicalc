@@ -18,11 +18,6 @@ class MyApp extends StatelessWidget {
           secondary: const Color(0xFF4FC3F7),
         ),
         useMaterial3: true,
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Color(0xFF161616)),
-          bodyMedium: TextStyle(color: Color(0xFF161616)),
-          headlineMedium: TextStyle(color: Color(0xFF161616)),
-        ),
       ),
       debugShowCheckedModeBanner: false,
       home: const LandingPage(),
@@ -30,113 +25,182 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LandingPage extends StatelessWidget {
+class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
+
+  @override
+  _LandingPageState createState() => _LandingPageState();
+}
+
+class _LandingPageState extends State<LandingPage> {
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  void _nextPage() {
+    if (_currentIndex < 2) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    }
+  }
+
+  void _previousPage() {
+    if (_currentIndex > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: const Text(
-          'Logicalc',
-          style: TextStyle(
-            color: Colors.white, // Set nav bar title to white
-            fontSize: 20,
-          ),
-        ),
+        title: const Text('Logicalc', style: TextStyle(color: Colors.white)),
         actions: [
           TextButton(
             onPressed: () {},
-            child: const Text(
-              'About',
-              style: TextStyle(color: Colors.white), // Set nav bar actions to white
-            ),
+            child: const Text('About', style: TextStyle(color: Colors.white)),
           ),
           TextButton(
             onPressed: () {},
-            child: const Text(
-              'Contact',
-              style: TextStyle(color: Colors.white), // Set nav bar actions to white
+            child: const Text('Contact', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+      drawer: _buildDrawer(context),
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: _onPageChanged,
+              children: [
+                _buildFeaturePage(
+                  icon: Icons.check_circle,
+                  title: 'Efficient Conversions',
+                  description: 'Convert equations, diagrams, and generate truth tables.',
+                ),
+                _buildFeaturePage(
+                  icon: Icons.calculate,
+                  title: 'Analyze Your Data',
+                  description: 'Utilize our tools to analyze your logical equations and data.',
+                ),
+                _buildFeaturePage(
+                  icon: Icons.table_chart,
+                  title: 'Generate Truth Tables',
+                  description: 'Easily create truth tables from your logical expressions.',
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_left),
+                onPressed: _previousPage,
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_right),
+                onPressed: _nextPage,
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ConversionPage()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+            ),
+            child: const Text('Get Started', style: TextStyle(color: Colors.white)),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturePage({required IconData icon, required String title, required String description}) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 80, color: Theme.of(context).colorScheme.secondary),
+          const SizedBox(height: 20),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              description,
+              textAlign: TextAlign.center,
             ),
           ),
         ],
-        iconTheme: const IconThemeData(color: Colors.white), // Set back arrow to white
       ),
-      body: SizedBox(
-        height: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-              child: Text(
-                'Welcome to Logicalc!',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyLarge!.color,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 50),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  const Icon(Icons.check_circle, size: 40, color: Colors.green),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Convert your equations efficiently',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.bodyLarge!.color,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Logicalc helps you convert your circuit diagram into equation, equation to circuit diagram, and provides your truth table!',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).textTheme.bodyMedium!.color,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            const Spacer(),
-            const SizedBox(height: 50), // Adjust this value to move the button up/down
+    );
+  }
 
-            // Get Started Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.secondary, // Match with other buttons
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ConversionPage()),
-                  );
-                },
-                child: const Text(
-                  'Get Started',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
-            const SizedBox(height: 50),
-          ],
-        ),
+  Drawer _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
+            child: const Text('Logicalc', style: TextStyle(color: Colors.white, fontSize: 24)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text('Home', style: TextStyle(color: Colors.black)),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text('History', style: TextStyle(color: Colors.black)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HistoryPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings', style: TextStyle(color: Colors.black)),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.info),
+            title: const Text('About', style: TextStyle(color: Colors.black)),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -149,112 +213,235 @@ class ConversionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Conversion Page',
-          style: TextStyle(color: Colors.white), // Ensures nav bar text is white here as well
-        ),
+        title: const Text('Conversion Page', style: TextStyle(color: Colors.white)),
         backgroundColor: Theme.of(context).colorScheme.primary,
-        iconTheme: const IconThemeData(color: Colors.white), // Set back arrow to white
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'Choose your conversion type here!',
-              style: TextStyle(fontSize: 24),
+              'Choose your conversion type!',
+              style: TextStyle(fontSize: 24, color: Colors.black),
             ),
             const SizedBox(height: 20),
-            _buildButton(
-              context,
-              'Go to Home Page',
-              () {
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()),
+                  MaterialPageRoute(builder: (context) => const EquationInputPage()),
                 );
               },
-            ),
-            const SizedBox(height: 10),
-            _buildButton(
-              context,
-              'Another Conversion Option',
-              () {
-                // Add your next conversion option
-              },
+              child: const Text(
+                'Convert Equation',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  // Common button builder
-  ElevatedButton _buildButton(BuildContext context, String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      ),
-      onPressed: onPressed,
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 18, color: Colors.white),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calculate),
+            label: 'Convert Equation',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.table_chart),
+            label: 'Truth Table',
+          ),
+        ],
+        onTap: (index) {
+          if (index == 1) {
+            // Redirect to Camera Page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CameraPage()),
+            );
+          }
+        },
       ),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
+class CameraPage extends StatelessWidget {
+  const CameraPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Home Page',
-          style: TextStyle(fontSize: 18, color: Colors.white),
-        ),
+        title: const Text('Camera Page', style: TextStyle(color: Colors.white)),
         backgroundColor: Theme.of(context).colorScheme.primary,
-        iconTheme: const IconThemeData(color: Colors.white), // Set back arrow to white
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
+        child: const Text(
+          'Camera functionality coming soon!',
+          style: TextStyle(fontSize: 24, color: Colors.black),
+        ),
+      ),
+    );
+  }
+}
+
+class EquationInputPage extends StatefulWidget {
+  const EquationInputPage({super.key});
+
+  @override
+  _EquationInputPageState createState() => _EquationInputPageState();
+}
+
+class _EquationInputPageState extends State<EquationInputPage> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Equation Input', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'Welcome to the Home Page!',
-              style: TextStyle(fontSize: 24),
+              'Input your equation:',
+              style: TextStyle(fontSize: 24, color: Colors.black),
             ),
             const SizedBox(height: 20),
-            _buildButton(
-              context,
-              'Go to Conversion Page',
-              () {
+            TextField(
+              controller: _controller,
+              readOnly: true,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Equation',
+              ),
+            ),
+            const SizedBox(height: 20),
+            CustomKeyboard(onKeyPressed: (value) {
+              setState(() {
+                _controller.text += value;
+              });
+            }),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Add conversion logic here
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ConversionPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const ResultPage(),
+                  ),
                 );
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+              ),
+              child: const Text('Convert', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  // Common button builder
-  ElevatedButton _buildButton(BuildContext context, String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+class ResultPage extends StatelessWidget {
+  const ResultPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Conversion Result', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      onPressed: onPressed,
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 18, color: Colors.white),
+      body: Center(
+        child: const Text(
+          'Result of the conversion will be shown here.',
+          style: TextStyle(fontSize: 24, color: Colors.black),
+        ),
+      ),
+    );
+  }
+}
+
+// History Page
+class HistoryPage extends StatelessWidget {
+  const HistoryPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('History', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: const Text(
+          'History of conversions will be displayed here.',
+          style: TextStyle(fontSize: 24, color: Colors.black),
+        ),
+      ),
+    );
+  }
+}
+
+// Custom Keyboard Widget
+class CustomKeyboard extends StatelessWidget {
+  final Function(String) onKeyPressed;
+
+  const CustomKeyboard({super.key, required this.onKeyPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 4,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        _buildKey('A'),         // Variable A
+        _buildKey('B'),         // Variable B
+        _buildKey('C'),         // Variable C
+        _buildKey('∧'),         // Logical AND (symbol: ∧)
+        _buildKey('∨'),         // Logical OR (symbol: ∨)
+        _buildKey('¬'),         // Logical NOT (symbol: ¬)
+        _buildKey('↑'),         // Logical NAND (symbol: ↑)
+        _buildKey('↓'),         // Logical NOR (symbol: ↓)
+        _buildKey('⊕'),         // Logical XOR (symbol: ⊕)
+        _buildKey('⊙'),         // Logical XNOR (symbol: ⊙)
+        _buildKey('('),         // Open parenthesis
+        _buildKey(')'),         // Close parenthesis
+        _buildKey('Clear'),     // Clear
+      ],
+    );
+  }
+
+  Widget _buildKey(String label) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0), // Space between buttons
+      child: ElevatedButton(
+        onPressed: () {
+          onKeyPressed(label);
+        },
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0), // Smaller button size
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 16), // Larger font size
+        ),
       ),
     );
   }
